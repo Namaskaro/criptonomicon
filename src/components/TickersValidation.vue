@@ -1,21 +1,14 @@
 <template>
-<div class="flex">
-      <div class="max-w-xs">
-        <label for="wallet" class="block text-sm font-medium text-gray-700"
-            >Тикер</label
-          >
-            <input
-              v-model="ticker"
-              @keypress.enter="add"
-              type="text"
-              class="block
-              w-full pr-10 border-gray-300 text-gray-900 focus:outline-none
-              focus:ring-gray-500 focus:border-gray-500 sm:text-sm rounded-md"
-              />
-            
-             
-      </div>
-</div>
+     <div class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap mt-4">
+            <span 
+            class="inline-flex items-center px-2 m-1 rounded-md text-xs font-medium bg-gray-300 text-gray-800 cursor-pointer"
+            v-for="coin in filteredCoins.slice(0, 4)"
+            :key="coin.id" 
+            >
+              {{coin}}
+            </span>
+            <div class="text-sm text-red-600" />                     
+    </div>
 </template>
 
 <script>
@@ -49,28 +42,24 @@ filteredCoins() {
   },
 methods: {
     ...mapActions(["getCoins","addTicker"]),
-    
-
     formatPrice(price) {
       if (price === "-") {
         return price;
       }
       return price > 1 ? price.toFixed(2) : price.toPrecision(2);
     },
-
-    
-
 },
 watch() {
 
 },
 mounted() {
-    this.getCoins()
-    
+    this.getCoins() 
 },
-
 
 }
 
 </script>
 
+<style lang="scss" scoped>
+
+</style>

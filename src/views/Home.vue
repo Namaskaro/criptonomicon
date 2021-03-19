@@ -5,6 +5,7 @@
         <template #base>
           <div class="mt-1 relative rounded-md shadow-md">
             <add-new-ticker />
+            <ticker-validation/>
             <add-ticker-button @add-ticker="add"></add-ticker-button>
           </div>
           </template>
@@ -53,6 +54,7 @@ import MainWrapper from '../components/MainWrapper'
 import TickersList from '../components/TickersList'
 import AddTickerButton from '../components/AddTickerButton'
 import Bar from '../components/Bar'
+import TickersValidation from '../components/TickersValidation'
 import {mapGetters, mapActions} from "vuex"
 
 export default {
@@ -66,7 +68,8 @@ export default {
     BaseWrapper,
     MainWrapper,
     Bar,
-    AddTickerButton
+    AddTickerButton,
+    TickersValidation
   },
   data() {
     return {
