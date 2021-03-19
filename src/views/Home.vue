@@ -105,9 +105,9 @@ export default {
     hideGraph() {
       this.selectedTicker = null
     },
-    removeTicker(tickerToRemove) {
-      this.tickers = this.tickers.filter(t => t !== tickerToRemove);
-    }
+    // removeTicker(tickerToRemove) {
+    //   this.tickers = this.tickers.filter(t => t !== tickerToRemove);
+    // }
 
   },
   
