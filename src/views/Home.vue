@@ -98,17 +98,7 @@ export default {
   },
   methods: {
     ...mapActions(["addTicker","getTickerData"]),
-    updateTicker(tickerName, price) {
-      this.tickers
-        .filter(t => t.name === tickerName)
-        .forEach(t => {
-          if (t === this.selectedTicker) {
-            this.graph.push(price);
-          }
-          t.price = price;
-          
-        });
-    },
+   
     select(ticker) {
       this.selectedTicker = ticker;
     },
