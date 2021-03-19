@@ -4,7 +4,8 @@
       <base-wrapper>
         <template #base>
           <div class="mt-1 relative rounded-md shadow-md">
-            <add-new-ticker/>
+            <add-new-ticker />
+            <add-ticker-button @add-ticker="add"></add-ticker-button>
           </div>
           </template>
       </base-wrapper>
@@ -50,6 +51,7 @@ import AddNewTicker from '../components/AddNewTicker'
 import BaseWrapper from '../components/BaseWrapper'
 import MainWrapper from '../components/MainWrapper'
 import TickersList from '../components/TickersList'
+import AddTickerButton from '../components/AddTickerButton'
 import Bar from '../components/Bar'
 import {mapGetters, mapActions} from "vuex"
 
@@ -63,7 +65,8 @@ export default {
     AddNewTicker,
     BaseWrapper,
     MainWrapper,
-    Bar
+    Bar,
+    AddTickerButton
   },
   data() {
     return {
@@ -98,7 +101,29 @@ export default {
   },
   methods: {
     ...mapActions(["addTicker","getTickerData"]),
-   
+   add() {
+      const currentTicker = {
+        name: this.ticker,
+        price: "-"
+      };
+      this.addTicker(currentTicker)
+      // localStorage.setItem("cryptonomicon-list", JSON.stringify(this.tickers));
+      this.ticker = "";
+      this.filter = "";
+      subscribeToTicker(currentTicker.name, newPrice =>
+        this.updateTicker(currentTicker.name, newPrice)
+      );
+    },
+    updateTicker(tickerName, price) {
+      this.tickers
+        .filter(t => t.name === tickerName)
+        .forEach(t => {
+          if (t === this.selectedTicker) {
+            this.graph.push(price);
+          }
+          t.price = price;
+        });
+    },
     select(ticker) {
       this.selectedTicker = ticker;
     },

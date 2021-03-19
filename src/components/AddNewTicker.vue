@@ -24,7 +24,7 @@
             </span>
             <div class="text-sm text-red-600" />
                
-               <add-ticker-button @add-ticker="add"></add-ticker-button>
+               
                </div>
       </div>
 </div>
@@ -61,16 +61,7 @@ filteredCoins() {
   },
 methods: {
     ...mapActions(["getCoins","addTicker"]),
-    updateTicker(tickerName, price) {
-      this.tickers
-        .filter(t => t.name === tickerName)
-        .forEach(t => {
-          if (t === this.selectedTicker) {
-            this.graph.push(price);
-          }
-          t.price = price;
-        });
-    },
+    
 
     formatPrice(price) {
       if (price === "-") {
@@ -79,19 +70,7 @@ methods: {
       return price > 1 ? price.toFixed(2) : price.toPrecision(2);
     },
 
-    add() {
-      const currentTicker = {
-        name: this.ticker,
-        price: "-"
-      };
-      this.addTicker(currentTicker)
-      // localStorage.setItem("cryptonomicon-list", JSON.stringify(this.tickers));
-      this.ticker = "";
-      this.filter = "";
-      subscribeToTicker(currentTicker.name, newPrice =>
-        this.updateTicker(currentTicker.name, newPrice)
-      );
-    },
+    
 
 },
 watch() {
