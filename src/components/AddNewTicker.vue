@@ -85,7 +85,7 @@ methods: {
         price: "-"
       };
       this.addTicker(currentTicker)
-      localStorage.setItem("cryptonomicon-list", JSON.stringify(this.tickers));
+      // localStorage.setItem("cryptonomicon-list", JSON.stringify(this.tickers));
       this.ticker = "";
       this.filter = "";
       subscribeToTicker(currentTicker.name, newPrice =>
