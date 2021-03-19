@@ -1,18 +1,166 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <main-wrapper>
+    <template #main>
+      <base-wrapper>
+        <template #base>
+          <div class="mt-1 relative rounded-md shadow-md">
+            <add-new-ticker/>
+          </div>
+          </template>
+      </base-wrapper>
+      <tickers-list v-if="tickers.length">
+        <template #ticker>
+         <ticker @click="select(t)"
+         v-for="t in tickers" 
+         :key="t.name"
+         :name="t.name"
+         :price="t.price"
+         @remove-ticker="removeTicker(t)"
+         :class="{
+              'border-4': selectedTicker === t
+            }"
+         />
+         </template>
+         
+       </tickers-list>
+       <template v-if="selectedTicker">
+      <bars-container 
+      :selectedTicker="selectedTicker"
+      :name="selectedTicker.name"
+      @hide-graph="hideGraph"
+      >
+      <bar
+      :price="selectedTicker.price"
+       v-for="(bar, idx) in normalizedGraph"
+            :key="idx"
+            :style="{ height: `${bar}%` }"
+      />
+      </bars-container>
+      </template>
+      </template>
+    </main-wrapper>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import {subscribeToTicker, unsubscribeFromTicker} from '../api/tickersSubscribe'
+import Ticker from "../components/Ticker"
+import BarsContainer from "../components/BarsContainer"
+import Autocomplete from '../components/Autocomplete'
+import AddNewTicker from '../components/AddNewTicker'
+import BaseWrapper from '../components/BaseWrapper'
+import MainWrapper from '../components/MainWrapper'
+import TickersList from '../components/TickersList'
+import Bar from '../components/Bar'
+import {mapGetters, mapActions} from "vuex"
 
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
-    HelloWorld
-  }
+    Ticker,
+    TickersList,
+    BarsContainer,
+    Autocomplete,
+    AddNewTicker,
+    BaseWrapper,
+    MainWrapper,
+    Bar
+  },
+  data() {
+    return {
+      selectedTicker: null,
+      graph: [],
+      page: 1
+    }
+  },
+  computed: {
+    ...mapGetters(["ticker","tickers","coins","tickerData"]),
+    startIndex() {
+      return (this.page - 1) * 6;
+    },
+    endIndex() {
+      return this.page * 6;
+    },
+    
+
+    normalizedGraph() {
+      const maxValue = Math.max(...this.graph);
+      const minValue = Math.min(...this.graph);
+      
+      if (maxValue === minValue) {
+        return this.graph.map(() => 50);
+      }
+
+      return this.graph.map(
+        price => 5 + ((price - minValue) * 95) / (maxValue - minValue)
+       
+      );  
+    },
+  },
+  methods: {
+    ...mapActions(["addTicker","getTickerData"]),
+    updateTicker(tickerName, price) {
+      this.tickers
+        .filter(t => t.name === tickerName)
+        .forEach(t => {
+          if (t === this.selectedTicker) {
+            this.graph.push(price);
+          }
+          t.price = price;
+          
+        });
+    },
+    select(ticker) {
+      this.selectedTicker = ticker;
+    },
+    hideGraph() {
+      this.selectedTicker = null
+    },
+    removeTicker(tickerToRemove) {
+      this.tickers = this.tickers.filter(t => t !== tickerToRemove);
+    }
+
+  },
+  
+   watch: {
+    selectedTicker() {
+      this.graph = [];
+    },
+      tickers(newValue, oldValue) {
+      // Почему не сработал watch при добавлении?
+      console.log(newValue === oldValue);
+      localStorage.setItem("cryptonomicon-list", JSON.stringify(this.tickers));
+    },
+
+
+  },
+  created() {
+    const windowData = Object.fromEntries(
+      new URL(window.location).searchParams.entries()
+    );
+
+    const VALID_KEYS = ["filter", "page"];
+
+    VALID_KEYS.forEach(key => {
+      if (windowData[key]) {
+        this[key] = windowData[key];
+      }
+    });
+
+    const tickersData = localStorage.getItem("cryptonomicon-list");
+
+    if (tickersData) {
+      this.tickers = JSON.parse(tickersData);
+      this.tickers.forEach(ticker => {
+        subscribeToTicker(ticker.name, newPrice =>
+          this.updateTicker(ticker.name, newPrice)
+        );
+      });
+    }
+
+    setInterval(this.updateTickers, 5000);
+  },
 }
 </script>
+
+<style src="../assets/app.css"></style>
+
